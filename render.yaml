@@ -1,0 +1,6 @@
+services:
+  - type: worker
+    name: fiyat-takip-botu
+    env: python
+    buildCommand: pip install -r requirements.txt && playwright install chromium
+    startCommand: python main.py
