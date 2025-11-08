@@ -6,6 +6,19 @@ from datetime import datetime
 import threading
 import time
 
+# Cloudflare bypass için
+try:
+    import cloudscraper
+    SCRAPER = cloudscraper.create_scraper(
+        browser={
+            'browser': 'chrome',
+            'platform': 'windows',
+            'mobile': False
+        }
+    )
+except ImportError:
+    SCRAPER = requests.Session()
+
 app = Flask(__name__)
 
 URL = "https://www.epey.com/robot-supurge/karsilastir/918677-986565/roborock-s8-maxv-ultra_roborock-saros-10/farklari/"
