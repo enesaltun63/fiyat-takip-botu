@@ -4,32 +4,3 @@ beautifulsoup4>=4.12.2
 lxml>=4.9.3
 gunicorn>=21.2.0
 cloudscraper>=1.2.71
-```
-
-**`cloudscraper`** ekledim - bu Cloudflare'ı otomatik bypass eder!
-
-## 🚀 Yeniden Deploy
-
-1. **requirements.txt**'e `cloudscraper>=1.2.71` ekleyin
-2. GitHub'a push atın veya dosyayı manuel güncelleyin
-3. Render'da **Manual Deploy**
-
-## 🧪 Test Sonrası Beklenen Log
-```
-🔄 Fiyat çekiliyor: https://www.epey.com/...
-📡 Status Code: 200
-📄 İçerik uzunluğu: 45832 bytes
-✅ Fiyat bulundu (selector: span.urunfiyati): 51.485,73 TL
-```
-
----
-
-## 🆘 Eğer Yine Çalışmazsa: ScraperAPI (Kesin Çözüm)
-
-Cloudscraper da çalışmazsa, **ScraperAPI** kullanmalıyız:
-
-1. [ScraperAPI.com](https://www.scraperapi.com/) → Ücretsiz hesap (1000 istek/ay)
-2. API Key'i alın
-3. Render'da **Environment Variables**:
-```
-   SCRAPER_API_KEY = your_api_key_here
