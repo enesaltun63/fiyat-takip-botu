@@ -195,4 +195,3 @@ def health():
     
     # Flask uygulamasını başlat
     port = int(os.getenv('PORT', 10000))
-    app.run(host='0.0.0.0', port=port)
