@@ -1,2 +1,2 @@
-playwright
+pip install playwright
 
