@@ -80,7 +80,7 @@ def fiyat_al():
             print(f"❌ HTTP {response.status_code} hatası")
             return None
         
-        soup = BeautifulSoup(response.content, 'lxml')
+        soup = BeautifulSoup(response.content, 'html.parser')
         
         # Fiyat elementini bul
         fiyat_elementi = soup.find('span', class_='urunfiyati')
