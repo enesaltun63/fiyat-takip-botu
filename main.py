@@ -29,36 +29,95 @@ fiyat_gecmisi = []
 son_fiyat = None
 
 def fiyat_al():
-    """BeautifulSoup ile fiyat çekme"""
+    """Cloudscraper ile fiyat çekme (Cloudflare bypass)"""
     try:
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-            'Accept-Language': 'tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Connection': 'keep-alive',
-            'Upgrade-Insecure-Requests': '1'
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'tr-TR,tr;q=0.9',
+            'Referer': 'https://www.google.com/'
         }
         
-        session = requests.Session()
-        response = session.get(URL, headers=headers, timeout=30)
-        response.raise_for_status()
+        print(f"🔄 Fiyat çekiliyor...")
+        
+        # Cloudscraper ile istek at
+        response = SCRAPER.get(URL, headers=headers, timeout=30)
+        
+        print(f"📡 Status Code: {response.status_code}")
+        
+        if response.status_code != 200:
+            print(f"❌ HTTP {response.status_code} hatası")
+            return None
         
         soup = BeautifulSoup(response.content, 'lxml')
         
-        # Fiyat elementini bul
-        fiyat_elementi = soup.select_one(SELECTOR)
+        # span.urunfiyati bul
+        fiyat_elementi = soup.find('span', class_='urunfiyati')
         
         if fiyat_elementi:
             fiyat = fiyat_elementi.get_text(strip=True)
+            print(f"✅ Fiyat bulundu: {fiyat}")
             return fiyat
         else:
+            print("❌ Fiyat elementi bulunamadı")
             return None
             
     except Exception as e:
         print(f"❌ Hata: {e}")
         return None
+```
 
+**Kaydet (Save)**
+
+---
+
+## 🚀 ADIM 3: Yeniden Deploy Et
+
+**Render dashboard'da:**
+
+1. Sağ üstte **"Manual Deploy"** butonunu bul
+2. Dropdown'dan **"Deploy latest commit"** seç
+3. **Bekle** - 2-3 dakika sürer
+
+**Ekranda göreceksin:**
+```
+==> Building...
+==> Installing dependencies from requirements.txt
+==> Successfully installed cloudscraper-1.2.71
+==> Starting service...
+```
+
+---
+
+## 📊 ADIM 4: Logları Kontrol Et
+
+Deploy bitince:
+
+1. **"Logs"** sekmesine tıkla
+2. **5 dakika bekle** (ilk fiyat kontrolü için)
+3. Şöyle bir şey göreceksin:
+
+**✅ BAŞARILI:**
+```
+🔄 Fiyat çekiliyor...
+📡 Status Code: 200
+✅ Fiyat bulundu: 51.485,73 TL
+📦 Şu anki fiyat: 51.485,73 TL
+```
+
+**❌ BAŞARISIZ:**
+```
+📡 Status Code: 403
+❌ HTTP 403 hatası
+```
+
+---
+
+## 🧪 ADIM 5: Test Et
+
+Tarayıcıda şu adresi aç:
+```
+https://your-app-name.onrender.com/fiyat
 def arka_plan_kontrol():
     """Arka planda sürekli fiyat kontrolü"""
     global son_fiyat
