@@ -189,7 +189,6 @@ def health():
     """Render için health check"""
     return jsonify({'status': 'healthy'}), 200
 
-if __name__ == '__main__':
     # Arka plan thread'ini başlat
     thread = threading.Thread(target=arka_plan_kontrol, daemon=True)
     thread.start()
