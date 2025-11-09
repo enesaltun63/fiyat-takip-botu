@@ -61,24 +61,32 @@ def fiyat_al():
     """Cloudscraper ile fiyat çekme"""
     try:
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             'Accept-Language': 'tr-TR,tr;q=0.9',
-            'Referer': 'https://www.google.com/'
+            'Referer': 'https://www.google.com/',
+            'Connection': 'keep-alive'
         }
         
         print(f"🔄 Fiyat çekiliyor...")
-        response = SCRAPER.get(URL, headers=headers, timeout=30)
+        print(f"⏱️ Timeout: 15 saniye")
+        
+        # Daha kısa timeout
+        response = SCRAPER.get(URL, headers=headers, timeout=15)
+        
         print(f"📡 Status Code: {response.status_code}")
+        print(f"📦 Content Length: {len(response.content)} bytes")
         
         if response.status_code != 200:
             print(f"❌ HTTP {response.status_code} hatası")
             return None
         
         soup = BeautifulSoup(response.content, 'lxml')
+        print(f"🔍 BeautifulSoup parse tamamlandı")
         
         # Tüm fiyatları bul
         fiyat_elementleri = soup.find_all('span', class_='urun_fiyat')
+        print(f"📊 Bulunan fiyat sayısı: {len(fiyat_elementleri)}")
         
         if fiyat_elementleri:
             # İlk (en üstteki) fiyatı al
@@ -86,16 +94,22 @@ def fiyat_al():
             
             # Sadece fiyat kısmını al (TL içeren ilk text)
             fiyat_text = ilk_element.get_text(strip=True)
+            print(f"🔎 Ham fiyat text: {fiyat_text[:50]}...")
             
             # "Ücretsiz Kargo" gibi ek metinleri temizle
-            # Sadece "XX.XXX,XX TL" kısmını al
             fiyat = fiyat_text.split('TL')[0].strip() + ' TL'
             
             print(f"✅ En üstteki fiyat bulundu: {fiyat}")
-            print(f"📊 Toplam {len(fiyat_elementleri)} fiyat var, ilki seçildi")
             return fiyat
         else:
-            print("❌ Fiyat elementi bulunamadı")
+            print("❌ span.urun_fiyat elementi bulunamadı")
+            
+            # Debug: Sayfada ne var?
+            tum_spanlar = soup.find_all('span', limit=5)
+            print(f"📋 İlk 5 span elementi:")
+            for i, span in enumerate(tum_spanlar, 1):
+                print(f"  {i}. class={span.get('class')} text={span.get_text(strip=True)[:30]}")
+            
             return None
             
     except Exception as e:
