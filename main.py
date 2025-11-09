@@ -6,18 +6,8 @@ from datetime import datetime
 import threading
 import time
 
-# Cloudflare bypass için
-try:
-    import cloudscraper
-    SCRAPER = cloudscraper.create_scraper(
-        browser={
-            'browser': 'chrome',
-            'platform': 'windows',
-            'mobile': False
-        }
-    )
-except ImportError:
-    SCRAPER = requests.Session()
+# Cloudflare bypass için - Basit session kullan
+SCRAPER = requests.Session()
 
 app = Flask(__name__)
 
@@ -58,21 +48,29 @@ def telegram_mesaj_gonder(mesaj):
         return False
 
 def fiyat_al():
-    """Cloudscraper ile fiyat çekme"""
+    """Requests ile fiyat çekme"""
     try:
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Accept-Language': 'tr-TR,tr;q=0.9',
-            'Referer': 'https://www.google.com/',
-            'Connection': 'keep-alive'
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+            'Accept-Language': 'tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1',
+            'Sec-Fetch-Dest': 'document',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'none',
+            'Sec-Fetch-User': '?1',
+            'Cache-Control': 'max-age=0',
+            'DNT': '1',
+            'Referer': 'https://www.google.com/'
         }
         
         print(f"🔄 Fiyat çekiliyor...")
-        print(f"⏱️ Timeout: 15 saniye")
+        print(f"⏱️ Timeout: 10 saniye")
         
-        # Daha kısa timeout
-        response = SCRAPER.get(URL, headers=headers, timeout=15)
+        # Basit requests ile dene
+        response = SCRAPER.get(URL, headers=headers, timeout=10, allow_redirects=True)
         
         print(f"📡 Status Code: {response.status_code}")
         print(f"📦 Content Length: {len(response.content)} bytes")
@@ -113,7 +111,10 @@ def fiyat_al():
             return None
             
     except Exception as e:
-        print(f"❌ Hata: {e}")
+        print(f"❌ Hata tipi: {type(e).__name__}")
+        print(f"❌ Hata mesajı: {str(e)[:200]}")
+        import traceback
+        print(f"❌ Traceback: {traceback.format_exc()[:500]}")
         return None
 
 def arka_plan_kontrol():
